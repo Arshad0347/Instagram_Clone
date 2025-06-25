@@ -48,10 +48,10 @@ router.put("/like-post", requireLogin, async (req, res) => {
     }
 
     // Check if user already liked the post
-    const post = await Post.findById(postId);
-    if (post.likes.includes(req.user._id)) {
-      return res.status(400).json({ error: "You already liked this post" });
-    }
+    // const post = await Post.findById(postId);
+    // if (post.likes.includes(req.user._id)) {
+    //   return res.status(400).json({ error: "You already liked this post" });
+    // }
 
     // Update the post
     const updatedPost = await Post.findByIdAndUpdate(
@@ -112,25 +112,45 @@ router.put("/unlike-post", requireLogin, async (req, res) => {
   }
 }); 
 
-router.post('/comment',requireLogin,(res,req)=>{
-    const {text,postId}=req.body;
-    if(!text || !postId){
-        return res.status(422).json({error:"Please add all the fields"});
-    }
-    const comment={
-        text,
-        postedBy:req.user._id
-    }
-    Post.findByIdAndUpdate(postId,{$push:{comment:comment}},{$new:true})
-    .then((err,result)=>{
-        if(err){
-            return res.status(422).json({error:err})
-        }else{
-            res.json(result)
-        }
-    })
+router.put('/comment-post',requireLogin,async(req,res)=>{
+  try {
+    const {postId,text}=req.body;
+    const updatedPost=await Post.findByIdAndUpdate(postId,
+      {
+        $push:{comment:{text,postedBy:req.user._id,}}
+      },
+      {
+        new:true
+      }
+    )
+    console.log(updatedPost);
+    
+    res.json(updatedPost)
+  } catch (error) {
+    console.log(error);
+  }
 })
 
+
+router.delete("/delete-post/:postId", requireLogin, (req, res) => {
+  Post.findOne({ _id: req.params.postId })
+    .then((post) => {
+      if (!post) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+      if (post.postedBy._id.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ error: "Unauthorized: You can only delete your own posts" });
+      }
+      Post.deleteOne({ _id: req.params.postId })
+        .then(() => {
+          res.json({ message: "Post deleted successfully" });
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json({ error: "Failed to delete post" });
+        });
+    })
+});
 
 
 module.exports = router;
