@@ -3,7 +3,7 @@ const router = express.Router();
 const requireLogin = require("../middleware/requireLogin");
 const Post = require("../models/post");
 
-router.post("/create-post", requireLogin, (req, res) => {
+router.post("/create-post", requireLogin, (req, res) => { //Post Creation
   const { title, body, pic } = req.body;
   if (!title || !body || !pic) {
     return res.status(422).json({ error: "Please add all the fields" });
@@ -21,13 +21,13 @@ router.post("/create-post", requireLogin, (req, res) => {
   });
 });
 
-router.get("/all-post", requireLogin, (req, res) => {
+router.get("/all-post", requireLogin, (req, res) => { //All Post Showing
   Post.find().then((posts) => {
     return res.status(200).json({ posts });
   });
 });
 
-router.get("/show-mypost", requireLogin, (req, res) => {
+router.get("/show-mypost", requireLogin, (req, res) => { //Showing Own Post
   Post.find({ postedBy: req.user._id })
     .populate("postedBy", "_id name")
     .then((myposts) => {
@@ -38,7 +38,7 @@ router.get("/show-mypost", requireLogin, (req, res) => {
     });
 });
 
-router.put("/like-post", requireLogin, async (req, res) => {
+router.put("/like-post", requireLogin, async (req, res) => { //Like a Post
   try {
     const { postId } = req.body;
 
@@ -75,7 +75,7 @@ router.put("/like-post", requireLogin, async (req, res) => {
   }
 });
 
-router.put("/unlike-post", requireLogin, async (req, res) => {
+router.put("/unlike-post", requireLogin, async (req, res) => { //Dislike a Post
   try {
     const { postId } = req.body;
 
@@ -112,7 +112,7 @@ router.put("/unlike-post", requireLogin, async (req, res) => {
   }
 }); 
 
-router.put('/comment-post',requireLogin,async(req,res)=>{
+router.put('/comment-post',requireLogin,async(req,res)=>{ //addition of comment
   try {
     const {postId,text}=req.body;
     const updatedPost=await Post.findByIdAndUpdate(postId,
@@ -131,8 +131,7 @@ router.put('/comment-post',requireLogin,async(req,res)=>{
   }
 })
 
-
-router.delete("/delete-post/:postId", requireLogin, (req, res) => {
+router.delete("/delete-post/:postId", requireLogin, (req, res) => { //delete a post
   Post.findOne({ _id: req.params.postId })
     .then((post) => {
       if (!post) {

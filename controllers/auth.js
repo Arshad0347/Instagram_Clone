@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const requireLogin = require("../middleware/requireLogin");
 
-router.post("/create-a-user", (req, res) => {
+router.post("/create-a-user", (req, res) => {   //New User Creation
   const { name, email, password } = req.body;
   if (!name || !email || !password) {
     res.status(422).json({ msg: "Please fill all the fields" });
@@ -28,7 +28,7 @@ router.post("/create-a-user", (req, res) => {
   }
 });
 
-router.post("/Login", (req, res) => {
+router.post("/Login", (req, res) => { //Login to Existing User
   const { email, password } = req.body;
   if (!email || !password) {
     res.status(422).json({ msg: "Please fill all the fields" });
@@ -51,7 +51,7 @@ router.post("/Login", (req, res) => {
   }
 });
 
-router.get("/protected", requireLogin, (req, res) => {
+router.get("/protected", requireLogin, (req, res) => { //Authorization Check
   res.status(200).json({ msg: "Protected Route" });
 });
 

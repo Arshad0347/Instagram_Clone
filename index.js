@@ -16,6 +16,7 @@ mongoose.connect(MONGO_URI)
 })
 app.use(require('./controllers/auth'))
 app.use(require('./controllers/post'))
+app.use(require('./controllers/user'))
 
 app.listen(PORT,()=>{
     console.log(`Server is running on port ${PORT}`);
